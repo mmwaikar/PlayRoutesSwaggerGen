@@ -52,4 +52,16 @@ object PlayRoutesParser {
   /** Parses a single Play route including the HTTP verb.
     */
   def routeParser[_: P] = P((httpVerbP ~ spacesP ~ pathP ~ spacesP ~ varNameP ~ "(" ~ spacesP ~ varNameTypesP ~ ")").!)
+
+  /** Parses a single Play route including the HTTP verb and returns the result as a tuple.
+    */
+  def routeParserT[_: P] = P( httpVerbP.! ~ spacesP ~ pathP.! ~ spacesP ~ varNameP.! ~ ("(" ~ spacesP ~ varNameTypesP ~ ")".!) )
+
+  def parseAsString(route: String): Parsed[String] = {
+    parse(route, routeParser(_))
+  }
+
+  def parseAsTuple(route: String): Parsed[(String, String, String, (Seq[String], String))] = {
+    parse(route, routeParserT(_))
+  }
 }
