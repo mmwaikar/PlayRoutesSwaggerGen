@@ -17,13 +17,15 @@ case class Route(httpVerb: String, path: String, method: String, params: Seq[Par
 
     // and forSummary becomes ["get", "Containers"], so the second item is going to be the name of the domain object
     val forSummary = methodName.split("(?=\\p{Upper})")
-
     val forHeading = forSummary.map(_.toLowerCase)
 
-    val summary =
+    val summary     =
       if (methodName.endsWith("s")) s"${forSummary.head.capitalize} $capitalizedTag ${forSummary.tail.mkString(" ")}"
       else s"${forSummary.head.capitalize} a $capitalizedTag ${forSummary.tail.mkString(" ")}"
-    val heading = s"${forHeading.head}-$tag-${forHeading.tail.mkString("-")}"
+    val heading     = s"${forHeading.head}-$tag-${forHeading.tail.mkString("-")}"
+    val description = s"${forHeading.head} $tag ${forHeading.tail.mkString(" ")}"
+    val operationId = forSummary.patch(1, Seq(capitalizedTag), 0).mkString("")
+    // println(s"operationId: $operationId")
 
     val response   = if (verb == "get") "'200'" else "'201'"
     val domain     = forSummary.tail.head.capitalize
@@ -32,24 +34,47 @@ case class Route(httpVerb: String, path: String, method: String, params: Seq[Par
 
     val paramsString = params.map(_.toYamlString).mkString("\n")
 
-    s"""
-    $heading
-      $verb:
-        tags:
-          - $capitalizedTag
-        summary: $summary
-        description: 
-        operationId: $methodName
-        parameters:
-          $paramsString
-        responses:
-          $response
-            description: s"$capitalizedTag $methodName"
-            content:
-              application/json:
-                schema:
-                  $ref: '#/components/schemas/$ref'
-    """
+    if (httpVerb == "post") {
+      s"""
+      $heading
+        $verb:
+          tags:
+            - $capitalizedTag
+          summary: $summary
+          description: $description
+          operationId: $operationId
+          parameters:
+            $paramsString
+          requestBody:
+            $ref: '#/components/requestBodies/ExternalIdFormBody'
+          responses:
+            $response
+              description: s"$capitalizedTag $methodName"
+              content:
+                application/json:
+                  schema:
+                    $ref: '#/components/schemas/$ref'
+      """
+    } else {
+      s"""
+      $heading
+        $verb:
+          tags:
+            - $capitalizedTag
+          summary: $summary
+          description: $description
+          operationId: $operationId
+          parameters:
+            $paramsString
+          responses:
+            $response
+              description: s"$capitalizedTag $methodName"
+              content:
+                application/json:
+                  schema:
+                    $ref: '#/components/schemas/$ref'
+      """
+    }
   }
 }
 
