@@ -4,6 +4,7 @@ import com.codionics.BaseSpec
 import java.nio.file.Files
 import java.nio.file.Paths
 import java.nio.charset.StandardCharsets
+import com.codionics.domain.Route
 
 class PlayRoutesParserSpec extends BaseSpec {
   val route =
@@ -76,9 +77,10 @@ class PlayRoutesParserSpec extends BaseSpec {
   }
 
   it should "generate the YAML documentation for routes" in {
-    val playRoutes = routes.split("\r\n").filter(_.trim.nonEmpty)
+    val lineSep = System.lineSeparator()
+    val playRoutes = routes.split(lineSep).filter(_.trim.nonEmpty)
     playRoutes should not be null
-    println(s"play route: ${playRoutes(0)}")
+    // println(s"play route: ${playRoutes(0)}")
 
     val routesDoc = playRoutes.map { r =>
       val playRoute = PlayRoutesParser.parseAsRoute(r.trim())
@@ -87,9 +89,10 @@ class PlayRoutesParserSpec extends BaseSpec {
 
       val yamlDoc = playRoute.toYamlString
       yamlDoc should not be null
-      yamlDoc
+      yamlDoc.trim()
     }
 
-    Files.write(Paths.get("routes.yaml"), routesDoc.mkString("\n").getBytes(StandardCharsets.UTF_8))
+    val routesNoNewlines = routesDoc.filterNot(rd => Route.hasOnlyWhiteSpace(rd))
+    Files.write(Paths.get("routes.yaml"), routesNoNewlines.mkString(lineSep).getBytes(StandardCharsets.UTF_8))
   }
 }

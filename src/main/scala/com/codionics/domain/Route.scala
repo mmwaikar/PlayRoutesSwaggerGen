@@ -21,7 +21,7 @@ case class Route(httpVerb: String, path: String, method: String, params: Seq[Par
       if (paramsString.isEmpty) ""
       else s"""parameters:
       $paramsString
-      """
+      """.trim().replaceAll("\\s+$", "")
 
     val schema = "$ref: " + s"'#/components/schemas/$ref'"
 
@@ -105,5 +105,10 @@ object Route {
     val domainName = if (domain.endsWith("s")) domain.dropRight(1) else domain
 
     RouteHelper(tag, methodName, qualifiedMethodParts, domainName)
+  }
+
+  def hasOnlyWhiteSpace(str: String): Boolean = {
+    val trimmed = str.trim
+    trimmed.forall(_.isWhitespace) || trimmed.forall(_ == ' ')
   }
 }

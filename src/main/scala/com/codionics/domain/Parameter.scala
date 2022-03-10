@@ -19,7 +19,7 @@ case class Parameter(
         style: $style
         explode: $explode
         schema:
-          type: ${withoutOption}"""
+          type: ${withoutOption}""".trim.replaceAll("\\s+$", "")
   }
 }
 
