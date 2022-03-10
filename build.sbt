@@ -10,7 +10,6 @@ lazy val root = (project in file("."))
     name := "PlayRoutesSwaggerGen",
     libraryDependencies ++= Seq(
       fastparse,
-      twirlApi,
       scalaTest % Test,
       scalaTestFlatspec % Test
     )
