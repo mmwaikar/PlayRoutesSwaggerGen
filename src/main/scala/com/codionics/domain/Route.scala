@@ -32,7 +32,7 @@ case class Route(httpVerb: String, path: String, method: String, params: Seq[Par
     val domainName = if (domain.endsWith("s")) domain.dropRight(1) else domain
     val ref        = if (methodName.endsWith("s")) s"${domainName}SeqMessage" else s"${domainName}ObjMessage"
 
-    val paramsString = params.map(_.toYamlString).mkString("\n")
+    val paramsString = params.map(_.toYamlString).mkString("")
     val schema = "$ref: " + s"'#/components/schemas/$ref'"
 
     if (httpVerb == "post") {

@@ -10,6 +10,8 @@ case class Parameter(
 ) {
 
   def toYamlString: String = {
+    val withoutOption = `type`.replace("option", "").replace("[", "").replace("]", "")
+
     s"""
       - name: $name
         description: $description
@@ -17,7 +19,7 @@ case class Parameter(
         style: $style
         explode: $explode
         schema:
-          type: ${`type`}
+          type: ${withoutOption}
     """
   }
 }
