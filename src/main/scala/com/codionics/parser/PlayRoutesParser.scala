@@ -71,6 +71,6 @@ object PlayRoutesParser {
     val parsedVal = parsedRoute.get.value
     
     val (httpVerb, path, method, tuple) = parsedVal
-    Route(httpVerb, path, method, tuple._1)
+    Route.create(httpVerb, path, method, tuple._1)
   }
 }

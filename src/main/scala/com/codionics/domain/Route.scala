@@ -1,15 +1,19 @@
 package com.codionics.domain
 
-case class Route(httpVerb: String, path: String, method: String, params: Map[String, String])
+case class Route(httpVerb: String, path: String, method: String, params: Seq[Parameter])
 
 object Route {
 
-  def apply(httpVerb: String, path: String, method: String, parameters: Seq[String]): Route = {
-    val paramsMap = parameters.map { param =>
+  def create(httpVerb: String, path: String, method: String, parameters: Seq[String]): Route = {
+    val params = parameters.map { param =>
       val Seq(paramName, paramType) = param.replace(",", "").trim().split(":").toSeq
-      (paramName.trim(), paramType.trim())
-    }.toMap
+
+      val name = paramName.trim()
+      val pType = paramType.trim().toLowerCase()
+      val location = if (path.contains(name)) ParamLocation.PathParam else ParamLocation.QueryParam
+      Parameter(name, pType, "", location)
+    }
     
-    Route(httpVerb, path, method, paramsMap)
+    Route(httpVerb, path, method, params)
   }
 }
