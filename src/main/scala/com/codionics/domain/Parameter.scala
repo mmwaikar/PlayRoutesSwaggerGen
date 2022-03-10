@@ -9,7 +9,7 @@ case class Parameter(
     explode: Boolean = true
 ) {
 
-  override def toString = {
+  def toYamlString: String = {
     s"""
       - name: $name
         description: $description

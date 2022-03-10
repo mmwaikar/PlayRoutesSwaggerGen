@@ -2,7 +2,7 @@ package com.codionics.domain
 
 case class Route(httpVerb: String, path: String, method: String, params: Seq[Parameter]) {
 
-  override def toString = {
+  def toYamlString: String = {
     val verb = httpVerb.toLowerCase
 
     val paths          = path.split("/").filter(_.nonEmpty)
@@ -19,7 +19,7 @@ case class Route(httpVerb: String, path: String, method: String, params: Seq[Par
       else s"${forSummary.head.capitalize} a $capitalizedTag ${forSummary.tail.mkString(" ")}"
     val heading = s"${forHeading.head}-$tag-${forHeading.tail.mkString("-")}"
 
-    val paramsString = params.map(_.toString).mkString("\n")
+    val paramsString = params.map(_.toYamlString).mkString("\n")
 
     s"""
     $heading

@@ -41,7 +41,7 @@ class PlayRoutesParserSpec extends BaseSpec {
     playRoute should not be null
     println(s"play route: $playRoute")
 
-    val yamlDoc = playRoute.toString()
+    val yamlDoc = playRoute.toYamlString
     yamlDoc should not be null
     println(s"yaml doc for the route: $yamlDoc")
   }
