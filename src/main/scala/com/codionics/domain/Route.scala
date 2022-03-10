@@ -5,23 +5,27 @@ case class Route(httpVerb: String, path: String, method: String, params: Seq[Par
   override def toString = {
     val verb = httpVerb.toLowerCase
 
-    val paths = path.split("/").filter(_.nonEmpty)
-    val tag   = paths(1).capitalize
+    val paths          = path.split("/").filter(_.nonEmpty)
+    val tag            = paths(1)
+    val capitalizedTag = tag.capitalize
 
     val names      = method.split("\\.")
     val methodName = names.last
     val forSummary = methodName.split("(?=\\p{Upper})")
-    
-    val summary    =
-      if (methodName.endsWith("s")) s"${forSummary.head.capitalize} $tag ${forSummary.tail.mkString(" ")}"
-      else s"${forSummary.head.capitalize} a $tag ${forSummary.tail.mkString(" ")}"
+    val forHeading = forSummary.map(_.toLowerCase)
+
+    val summary =
+      if (methodName.endsWith("s")) s"${forSummary.head.capitalize} $capitalizedTag ${forSummary.tail.mkString(" ")}"
+      else s"${forSummary.head.capitalize} a $capitalizedTag ${forSummary.tail.mkString(" ")}"
+    val heading = s"${forHeading.head}-$tag-${forHeading.tail.mkString("-")}"
 
     val paramsString = params.map(_.toString).mkString("\n")
 
     s"""
+    $heading
       $verb:
         tags:
-          - $tag
+          - $capitalizedTag
         summary: $summary
         description: 
         operationId: $methodName
