@@ -2,35 +2,20 @@ package com.codionics.domain
 
 case class Route(httpVerb: String, path: String, method: String, params: Seq[Parameter]) {
 
+  def getResponse: String = {
+    if (httpVerb.toLowerCase == "get") "'200'" else "'201'"
+  }
+
   def toYamlString: String = {
+    val routeHelper = Route.getRouteHelper(httpVerb, path, method)
+
     val verb = httpVerb.toLowerCase
 
-    val paths          = path.split("/").filter(_.nonEmpty)
-    val tag            = paths(1)
-    val capitalizedTag = tag.capitalize
-
-    // method is of the form com.intercax.syndeia.controllers.external.BitBucketController.getContainers
-    val names = method.split("\\.")
-
-    // so methodName becomes getContainers
-    val methodName = names.last
-
-    // and forSummary becomes ["get", "Containers"], so the second item is going to be the name of the domain object
-    val forSummary = methodName.split("(?=\\p{Upper})")
-    val forHeading = forSummary.map(_.toLowerCase)
-
-    val summary     =
-      if (methodName.endsWith("s")) s"${forSummary.head.capitalize} $capitalizedTag ${forSummary.tail.mkString(" ")}"
-      else s"${forSummary.head.capitalize} a $capitalizedTag ${forSummary.tail.mkString(" ")}"
-    val heading     = s"${forHeading.head}-$tag-${forHeading.tail.mkString("-")}"
-    val description = s"${forHeading.head} $tag ${forHeading.tail.mkString(" ")}"
-    val operationId = forSummary.patch(1, Seq(capitalizedTag), 0).mkString("")
-    // println(s"operationId: $operationId")
-
-    val response   = if (verb == "get") "'200'" else "'201'"
-    val domain     = forSummary.tail.head.capitalize
-    val domainName = if (domain.endsWith("s")) domain.dropRight(1) else domain
-    val ref        = if (methodName.endsWith("s")) s"${domainName}SeqMessage" else s"${domainName}ObjMessage"
+    val summary     = routeHelper.getSummary
+    val heading     = routeHelper.getHeading
+    val description = routeHelper.getDescription
+    val operationId = routeHelper.getOperationId
+    val ref        = routeHelper.getRef
 
     val paramsString = params.map(_.toYamlString).mkString("")
     val schema = "$ref: " + s"'#/components/schemas/$ref'"
@@ -40,7 +25,7 @@ case class Route(httpVerb: String, path: String, method: String, params: Seq[Par
       $heading
         $verb:
           tags:
-            - $capitalizedTag
+            - ${routeHelper.getCapitalizedTag}
           summary: $summary
           description: $description
           operationId: $operationId
@@ -49,8 +34,8 @@ case class Route(httpVerb: String, path: String, method: String, params: Seq[Par
           requestBody:
             $ref: '#/components/requestBodies/ExternalIdFormBody'
           responses:
-            $response
-              description: s"$capitalizedTag $methodName"
+            ${getResponse}
+              description: s"${routeHelper.getCapitalizedTag} ${routeHelper.methodName}"
               content:
                 application/json:
                   schema:
@@ -61,15 +46,15 @@ case class Route(httpVerb: String, path: String, method: String, params: Seq[Par
       $heading
         $verb:
           tags:
-            - $capitalizedTag
+            - ${routeHelper.getCapitalizedTag}
           summary: $summary
           description: $description
           operationId: $operationId
           parameters:
             $paramsString
           responses:
-            $response
-              description: s"$capitalizedTag $methodName"
+            ${getResponse}
+              description: s"${routeHelper.getCapitalizedTag} ${routeHelper.methodName}"
               content:
                 application/json:
                   schema:
@@ -82,6 +67,8 @@ case class Route(httpVerb: String, path: String, method: String, params: Seq[Par
 object Route {
 
   def create(httpVerb: String, path: String, method: String, parameters: Seq[String]): Route = {
+    val routeHelper = getRouteHelper(httpVerb, path, method)
+
     val params = parameters.map { param =>
       val Seq(paramName, paramType) = param.replace(",", "").trim().split(":").toSeq
 
@@ -91,6 +78,29 @@ object Route {
       Parameter(name, pType, "", location)
     }
 
-    Route(httpVerb, path, method, params)
+    val actualParams = routeHelper.withAuthParams(params)
+    Route(httpVerb, path, method, actualParams)
+  }
+
+  def getRouteHelper(httpVerb: String, path: String, method: String): RouteHelper = {
+    val verb = httpVerb.toLowerCase
+
+    val paths          = path.split("/").filter(_.nonEmpty)
+    val tag            = paths(1)
+    val capitalizedTag = tag.capitalize
+
+    // method is of the form com.intercax.syndeia.controllers.external.BitBucketController.getContainers
+    val names = method.split("\\.")
+
+    // so methodName becomes getContainers
+    val methodName = names.last
+
+    // and qualifiedMethodParts becomes ["get", "Containers"], so the second item is going to be the name of the domain object
+    val qualifiedMethodParts = methodName.split("(?=\\p{Upper})")
+
+    val domain     = qualifiedMethodParts.tail.head.capitalize
+    val domainName = if (domain.endsWith("s")) domain.dropRight(1) else domain
+
+    RouteHelper(tag, methodName, qualifiedMethodParts, domainName)
   }
 }

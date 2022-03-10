@@ -23,3 +23,10 @@ case class Parameter(
     """
   }
 }
+
+object Parameter {
+
+  def getUserIdParam(tag: String) = Parameter("User-Id", "string", s"$tag UserName", ParamLocation.HeaderParam, "simple")
+
+  def getExtAuthTokenParam(tag: String) = Parameter("Ext-Auth-Token", "string", s"$tag Password", ParamLocation.HeaderParam, "simple")
+}

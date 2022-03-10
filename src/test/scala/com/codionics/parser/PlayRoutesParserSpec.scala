@@ -1,34 +1,38 @@
 package com.codionics.parser
 
 import com.codionics.BaseSpec
+import java.nio.file.Files
+import java.nio.file.Paths
+import java.nio.charset.StandardCharsets
 
 class PlayRoutesParserSpec extends BaseSpec {
   val route =
     "GET     /external/bitbucket/:repoKey/containers                     com.intercax.syndeia.controllers.external.BitBucketController.getContainers(repoKey: String, `type.externalKey`: Option[String], `other.workspace`: Option[String], page: Option[String], perPage: Option[Int])"
 
   val routes = """
-  GET      /external/doors/repositories                                    com.intercax.syndeia.controllers.external.DOORSController.getRepositories()
-  GET      /external/doors/repositories/:key                               com.intercax.syndeia.controllers.external.DOORSController.getRepositoryByExternalKey(key: String)
-  POST     /external/doors/repositories/external/id                        com.intercax.syndeia.controllers.external.DOORSController.getRepositoryByExternalId()
-  GET      /external/doors/:repoKey/containers                             com.intercax.syndeia.controllers.external.DOORSController.getContainers(repoKey: String,`type.key`:Option[String])
-  GET      /external/doors/:repoKey/containers/:key                        com.intercax.syndeia.controllers.external.DOORSController.getContainerByExternalKey(repoKey: String, key: String)
-  POST     /external/doors/:repoKey/containers/external/id                 com.intercax.syndeia.controllers.external.DOORSController.getContainerByExternalId(repoKey: String)
-  POST     /external/doors/:repoKey/containers/search                      com.intercax.syndeia.controllers.external.DOORSController.containerSearch(repoKey: String)
-  GET      /external/doors/:repoKey/artifacts                              com.intercax.syndeia.controllers.external.DOORSController.getArtifacts(repoKey: String, `container.externalKey`: Option[String], `type.externalKey`: Option[String], `other.folder`: Option[String], `other.collection`: Option[String], `other.resource`: Option[String], `other.component`: Option[String], `other.configuration`: Option[String], page: Option[String], pageSize: Option[Int])
-  GET      /external/doors/:repoKey/artifacts/:key                         com.intercax.syndeia.controllers.external.DOORSController.getArtifactByExternalKey(repoKey: String, key: String, `type.externalKey`: Option[String], `container.externalKey`: Option[String], `other.folder`: Option[String], `other.component`: Option[String], `other.configuration`: Option[String])
-  POST     /external/doors/:repoKey/artifacts/external/id                  com.intercax.syndeia.controllers.external.DOORSController.getArtifactByExternalId(repoKey: String)
-  GET      /external/doors/:repoKey/relations                              com.intercax.syndeia.controllers.external.DOORSController.getRelations(repoKey:String, `container.externalKey` : Option[String],  `type.externalKey` : Option[String],  externalKey : Option[String], `source.externalKey` : Option[String],  `target.externalKey` : Option[String], `other.configuration`: Option[String])
-  GET      /external/doors/:repoKey/relation/:key                          com.intercax.syndeia.controllers.external.DOORSController.getRelationByExternalKey(repoKey: String, key: String, `other.configuration`: Option[String])
-  POST     /external/doors/:repoKey/relation/external/id                   com.intercax.syndeia.controllers.external.DOORSController.getRelationByExternalId(repoKey: String)
-  GET      /external/doors/:repoKey/types/artifact                         com.intercax.syndeia.controllers.external.DOORSController.getArtifactTypes(repoKey: String, `container.externalKey` : Option[String])
-  GET      /external/doors/:repoKey/types/artifact/:externalKey            com.intercax.syndeia.controllers.external.DOORSController.getArtifactTypeByExternalKey(repoKey: String, externalKey: String, `container.externalKey` : Option[String])
-  POST     /external/doors/:repoKey/types/artifact/external/id             com.intercax.syndeia.controllers.external.DOORSController.getArtifactTypeByExternalId(repoKey: String)
-  GET      /external/doors/:repoKey/types/container                        com.intercax.syndeia.controllers.external.DOORSController.getContainerTypes(repoKey: String)
-  GET      /external/doors/:repoKey/types/container/:externalKey           com.intercax.syndeia.controllers.external.DOORSController.getContainerTypeByExternalKey(repoKey: String, externalKey: String)
-  POST     /external/doors/:repoKey/types/container/external/id            com.intercax.syndeia.controllers.external.DOORSController.getContainerTypeByExternalId(repoKey: String)
-  POST     /external/doors/:repoKey/artifacts/search                       com.intercax.syndeia.controllers.external.DOORSController.artifactSearch(repoKey: String, `other.configuration`: Option[String])
-  GET      /external/doors/:repoKey/signIn                                 com.intercax.syndeia.controllers.external.DOORSController.signIn(repoKey: String)
-  GET      /external/doors/:repoKey/signOut                                com.intercax.syndeia.controllers.external.DOORSController.signOut(repoKey: String)
+  GET      /external/artifactory/repositories                                    com.intercax.syndeia.controllers.external.ArtifactoryController.getRepositories()
+  GET      /external/artifactory/repositories/:key                               com.intercax.syndeia.controllers.external.ArtifactoryController.getRepositoryByExternalKey(key: String)
+  POST     /external/artifactory/repositories/external/id                        com.intercax.syndeia.controllers.external.ArtifactoryController.getRepositoryByExternalId()
+  GET      /external/artifactory/:repoKey/containers                             com.intercax.syndeia.controllers.external.ArtifactoryController.getContainers(repoKey: String,`type.externalKey`:Option[String])
+  GET      /external/artifactory/:repoKey/containers/:key                        com.intercax.syndeia.controllers.external.ArtifactoryController.getContainerByExternalKey(repoKey: String, key: String,`type.externalKey`:Option[String])
+  POST     /external/artifactory/:repoKey/containers/external/id                 com.intercax.syndeia.controllers.external.ArtifactoryController.getContainerByExternalId(repoKey: String)
+  POST     /external/artifactory/:repoKey/containers/search                      com.intercax.syndeia.controllers.external.ArtifactoryController.containerSearch(repoKey: String)
+  GET      /external/artifactory/:repoKey/artifacts                              com.intercax.syndeia.controllers.external.ArtifactoryController.getArtifacts(repoKey: String, `container.externalKey`: Option[String], `type.externalKey`: Option[String], `other.parent`: Option[String])
+  GET      /external/artifactory/:repoKey/artifacts/:key                         com.intercax.syndeia.controllers.external.ArtifactoryController.getArtifactByExternalKey(repoKey: String, key: String, `container.externalKey`: Option[String], `type.externalKey`: Option[String])
+  POST     /external/artifactory/:repoKey/artifacts/external/id                  com.intercax.syndeia.controllers.external.ArtifactoryController.getArtifactByExternalId(repoKey: String)
+  POST     /external/artifactory/:repoKey/artifacts/search                       com.intercax.syndeia.controllers.external.ArtifactoryController.artifactSearch(repoKey: String)
+  GET      /external/artifactory/:repoKey/relations                              com.intercax.syndeia.controllers.external.ArtifactoryController.getRelations(repoKey: String, `container.externalKey`: Option[String], `type.externalKey`: Option[String], `source.externalKey`: Option[String], `target.externalKey`: Option[String])
+  GET      /external/artifactory/:repoKey/relations/:externalKey                 com.intercax.syndeia.controllers.external.ArtifactoryController.getRelationByExternalKey(repoKey: String, externalKey: String, `container.externalKey`: Option[String])
+  POST     /external/artifactory/:repoKey/relations/external/id                  com.intercax.syndeia.controllers.external.ArtifactoryController.getRelationByExternalId(repoKey: String)
+  GET      /external/artifactory/:repoKey/types/container                        com.intercax.syndeia.controllers.external.ArtifactoryController.getContainerTypes(repoKey: String)
+  GET      /external/artifactory/:repoKey/types/container/:externalKey           com.intercax.syndeia.controllers.external.ArtifactoryController.getContainerTypeByExternalKey(repoKey: String, externalKey: String)
+  POST     /external/artifactory/:repoKey/types/container/external/id            com.intercax.syndeia.controllers.external.ArtifactoryController.getContainerTypeByExternalId(repoKey: String)
+  GET      /external/artifactory/:repoKey/types/artifact                         com.intercax.syndeia.controllers.external.ArtifactoryController.getArtifactTypes(repoKey: String)
+  GET      /external/artifactory/:repoKey/types/artifact/:externalKey            com.intercax.syndeia.controllers.external.ArtifactoryController.getArtifactTypeByExternalKey(repoKey: String, externalKey: String)
+  POST     /external/artifactory/:repoKey/types/artifact/external/id             com.intercax.syndeia.controllers.external.ArtifactoryController.getArtifactTypeByExternalId(repoKey: String)
+  GET      /external/artifactory/:repoKey/types/relation                         com.intercax.syndeia.controllers.external.ArtifactoryController.getRelationTypes(repoKey: String)
+  GET      /external/artifactory/:repoKey/types/relation/:externalKey            com.intercax.syndeia.controllers.external.ArtifactoryController.getRelationTypeByExternalKey(repoKey: String, externalKey: String)
+  POST     /external/artifactory/:repoKey/types/relation/external/id             com.intercax.syndeia.controllers.external.ArtifactoryController.getRelationTypeByExternalId(repoKey: String)
   """
 
   "The PlayRoutesParser" should "parse a Play route as a string" in {
@@ -76,14 +80,16 @@ class PlayRoutesParserSpec extends BaseSpec {
     playRoutes should not be null
     println(s"play route: ${playRoutes(0)}")
 
-    playRoutes.foreach { r =>
+    val routesDoc = playRoutes.map { r =>
       val playRoute = PlayRoutesParser.parseAsRoute(r.trim())
       playRoute should not be null
       // println(s"play route: $playRoute")
 
       val yamlDoc = playRoute.toYamlString
       yamlDoc should not be null
-      println(s"$yamlDoc")
+      yamlDoc
     }
+
+    Files.write(Paths.get("routes.yaml"), routesDoc.mkString("\n").getBytes(StandardCharsets.UTF_8))
   }
 }
