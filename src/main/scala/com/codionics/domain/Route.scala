@@ -8,57 +8,60 @@ case class Route(httpVerb: String, path: String, method: String, params: Seq[Par
 
   def toYamlString: String = {
     val routeHelper = Route.getRouteHelper(httpVerb, path, method)
-
-    val verb = httpVerb.toLowerCase
+    val verb        = httpVerb.toLowerCase
 
     val summary     = routeHelper.getSummary
     val heading     = routeHelper.getHeading
     val description = routeHelper.getDescription
     val operationId = routeHelper.getOperationId
-    val ref        = routeHelper.getRef
+    val ref         = routeHelper.getRef
 
     val paramsString = params.map(_.toYamlString).mkString("")
+    val parameters   =
+      if (paramsString.isEmpty) ""
+      else s"""parameters:
+      $paramsString
+      """
+
     val schema = "$ref: " + s"'#/components/schemas/$ref'"
 
     if (httpVerb == "post") {
       s"""
-      $heading
-        $verb:
-          tags:
-            - ${routeHelper.getCapitalizedTag}
-          summary: $summary
-          description: $description
-          operationId: $operationId
-          parameters:
-            $paramsString
-          requestBody:
-            $ref: '#/components/requestBodies/ExternalIdFormBody'
-          responses:
-            ${getResponse}
-              description: s"${routeHelper.getCapitalizedTag} ${routeHelper.methodName}"
-              content:
-                application/json:
-                  schema:
-                    $schema
+$heading
+  $verb:
+    tags:
+      - ${routeHelper.getCapitalizedTag}
+    summary: $summary
+    description: $description
+    operationId: $operationId
+    $parameters
+    requestBody:
+      $ref: '#/components/requestBodies/ExternalIdFormBody'
+    responses:
+      ${getResponse}
+        description: s"${routeHelper.getCapitalizedTag} ${routeHelper.methodName}"
+        content:
+          application/json:
+            schema:
+              $schema
       """
     } else {
       s"""
-      $heading
-        $verb:
-          tags:
-            - ${routeHelper.getCapitalizedTag}
-          summary: $summary
-          description: $description
-          operationId: $operationId
-          parameters:
-            $paramsString
-          responses:
-            ${getResponse}
-              description: s"${routeHelper.getCapitalizedTag} ${routeHelper.methodName}"
-              content:
-                application/json:
-                  schema:
-                    $schema
+$heading
+  $verb:
+    tags:
+      - ${routeHelper.getCapitalizedTag}
+    summary: $summary
+    description: $description
+    operationId: $operationId
+    $parameters
+    responses:
+      ${getResponse}
+        description: s"${routeHelper.getCapitalizedTag} ${routeHelper.methodName}"
+        content:
+          application/json:
+            schema:
+              $schema
       """
     }
   }

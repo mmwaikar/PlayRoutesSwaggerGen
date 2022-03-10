@@ -9,9 +9,10 @@ case class RouteHelper(tag: String, methodName: String, qualifiedMethodParts: Se
   def getSummary: String = {
     val head = qualifiedMethodParts.head.capitalize
     val tail = qualifiedMethodParts.tail.mkString(" ")
+    val article = getArticle(tag)
 
     if (methodName.endsWith("s")) s"$head ${getCapitalizedTag} $tail"
-    else s"$head a ${getCapitalizedTag} $tail"
+    else s"$head $article ${getCapitalizedTag} $tail"
   }
 
   def getHeading: String = {
@@ -39,5 +40,14 @@ case class RouteHelper(tag: String, methodName: String, qualifiedMethodParts: Se
   def withAuthParams(params: Seq[Parameter]): Seq[Parameter] = {
     if (methodName.contains("Repositories")) params
     else params ++ getAuthParams    
+  }
+
+  def beginsWithVowel(s: String): Boolean = {
+    val vowels = Seq("a", "e", "i", "o", "u")
+    vowels.contains(s.head.toLower.toString)
+  }
+
+  def getArticle(s: String): String = {
+    if (beginsWithVowel(s)) "an" else "a"
   }
 }
