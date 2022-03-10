@@ -33,6 +33,7 @@ case class Route(httpVerb: String, path: String, method: String, params: Seq[Par
     val ref        = if (methodName.endsWith("s")) s"${domainName}SeqMessage" else s"${domainName}ObjMessage"
 
     val paramsString = params.map(_.toYamlString).mkString("\n")
+    val schema = "$ref: " + s"'#/components/schemas/$ref'"
 
     if (httpVerb == "post") {
       s"""
@@ -53,7 +54,7 @@ case class Route(httpVerb: String, path: String, method: String, params: Seq[Par
               content:
                 application/json:
                   schema:
-                    $ref: '#/components/schemas/$ref'
+                    $schema
       """
     } else {
       s"""
@@ -72,7 +73,7 @@ case class Route(httpVerb: String, path: String, method: String, params: Seq[Par
               content:
                 application/json:
                   schema:
-                    $ref: '#/components/schemas/$ref'
+                    $schema
       """
     }
   }
