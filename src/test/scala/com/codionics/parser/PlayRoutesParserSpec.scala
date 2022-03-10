@@ -35,4 +35,14 @@ class PlayRoutesParserSpec extends BaseSpec {
     playRoute should not be null
     println(s"play route: $playRoute")
   }
+
+  it should "generate the YAML documentation for a Route" in {
+    val playRoute = PlayRoutesParser.parseAsRoute(route)
+    playRoute should not be null
+    println(s"play route: $playRoute")
+
+    val yamlDoc = playRoute.toString()
+    yamlDoc should not be null
+    println(s"yaml doc for the route: $yamlDoc")
+  }
 }
