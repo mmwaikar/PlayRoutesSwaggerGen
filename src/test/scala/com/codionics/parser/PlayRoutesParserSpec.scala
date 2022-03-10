@@ -1,9 +1,8 @@
 package com.codionics.parser
 
-import org.scalatest.flatspec.AnyFlatSpec
-import org.scalatest.matchers.should._
+import com.codionics.BaseSpec
 
-class PlayRoutesParserSpec extends AnyFlatSpec with Matchers {
+class PlayRoutesParserSpec extends BaseSpec {
   val route =
     "GET     /external/bitbucket/:repoKey/containers                     com.intercax.syndeia.controllers.external.BitBucketController.getContainers(repoKey: String, `type.externalKey`: Option[String], `other.workspace`: Option[String], page: Option[String], perPage: Option[Int])"
 
@@ -29,5 +28,11 @@ class PlayRoutesParserSpec extends AnyFlatSpec with Matchers {
     println(s"path: ${path}")
     println(s"method: ${method}")
     println(s"first: ${first}")
+  }
+
+  it should "parse a Play route as a Route" in {
+    val playRoute = PlayRoutesParser.parseAsRoute(route)
+    playRoute should not be null
+    println(s"play route: $playRoute")
   }
 }

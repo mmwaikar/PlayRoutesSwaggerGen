@@ -1,5 +1,6 @@
 package com.codionics.parser
 
+import com.codionics.domain._
 import fastparse._, NoWhitespace._
 
 object PlayRoutesParser {
@@ -63,5 +64,13 @@ object PlayRoutesParser {
 
   def parseAsTuple(route: String): Parsed[(String, String, String, (Seq[String], String))] = {
     parse(route, routeParserT(_))
+  }
+
+  def parseAsRoute(route: String): Route = {
+    val parsedRoute = parseAsTuple(route)
+    val parsedVal = parsedRoute.get.value
+    
+    val (httpVerb, path, method, tuple) = parsedVal
+    Route(httpVerb, path, method, tuple._1)
   }
 }

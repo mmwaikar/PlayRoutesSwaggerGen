@@ -1,4 +1,4 @@
-package com.codionics.parser
+package com.codionics.domain
 
 case class Route(httpVerb: String, path: String, method: String, params: Map[String, String])
 

@@ -1,6 +1,6 @@
 package com.codionics.generator
 
-import com.codionics.parser.Route
+import com.codionics.domain.Route
 
 object YamlGenerator extends RouteGenerator {
 
