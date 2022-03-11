@@ -21,9 +21,9 @@ case class Route(httpVerb: String, path: String, method: String, params: Seq[Par
       if (paramsString.isEmpty) ""
       else s"""parameters:
       $paramsString
-      """.trim().replaceAll("\\s+$", "")
+      """.trim
 
-    val schema = "$ref: " + s"'#/components/schemas/$ref'"
+    val schema = "$ref: " + s"'../schema/store.yaml#/$ref'"
 
     if (httpVerb == "post") {
       s"""
@@ -39,7 +39,7 @@ $heading
       $ref: '#/components/requestBodies/ExternalIdFormBody'
     responses:
       ${getResponse}
-        description: s"${routeHelper.getCapitalizedTag} ${routeHelper.methodName}"
+        description: ${routeHelper.getResponseDescription}
         content:
           application/json:
             schema:
@@ -57,7 +57,7 @@ $heading
     $parameters
     responses:
       ${getResponse}
-        description: s"${routeHelper.getCapitalizedTag} ${routeHelper.methodName}"
+        description: ${routeHelper.getResponseDescription}
         content:
           application/json:
             schema:
@@ -104,9 +104,15 @@ object Route {
     // in case of types, the second and third item combined is the name of the type
     val tail       = qualifiedMethodParts.tail
     val domain     = if (methodName.contains("Type")) s"${tail.head}${tail.tail.head}" else tail.head.capitalize
-    val domainName = if (domain.endsWith("s")) domain.dropRight(1) else domain
+    val domainName = getDomainName(domain)
 
     RouteHelper(tag, methodName, qualifiedMethodParts, domainName)
+  }
+
+  def getDomainName(domain: String): String = {
+    if (domain.endsWith("ies")) domain.dropRight(3) + "y"
+    else if (domain.endsWith("s")) domain.dropRight(1)
+    else domain
   }
 
   def hasOnlyWhiteSpace(str: String): Boolean = {

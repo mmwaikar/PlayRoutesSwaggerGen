@@ -23,6 +23,12 @@ case class RouteHelper(tag: String, methodName: String, qualifiedMethodParts: Se
     s"${qualifiedMethodPartsLower.head} $tag ${qualifiedMethodPartsLower.tail.mkString(" ")}"
   }
 
+  def getResponseDescription: String = {
+    val desc = getDescription
+    val descArray = desc.split(" ").tail.map(_.capitalize)
+    descArray.mkString(" ")
+  }
+
   def getOperationId: String = {
     qualifiedMethodParts.patch(1, Seq(getCapitalizedTag), 0).mkString("")
   }
