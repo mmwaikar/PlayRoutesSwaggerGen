@@ -65,6 +65,29 @@ $heading
       """
     }
   }
+
+  def toYamlSummary: String = {
+    val routeHelper = Route.getRouteHelper(httpVerb, path, method)
+    val pathSummary = getPathSummary(path)
+    val schema = "$ref: " + s""""./paths/${routeHelper.tag}.yaml#/${routeHelper.getHeading}""""
+
+    s"""
+$pathSummary:
+  $schema
+    """
+  }
+
+  def getPathSummary(path: String) = {
+    val paths       = path.split("/").toSeq
+    val pathSummary = paths
+      .map(p => {
+        if (p.startsWith(":")) s"{${p.replace(":", "")}}"
+        else p
+      })
+      .mkString("/")
+
+    if (pathSummary.startsWith("/")) s"'$pathSummary'" else s"'/$pathSummary'"
+  }
 }
 
 object Route {

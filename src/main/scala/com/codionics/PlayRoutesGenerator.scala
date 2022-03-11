@@ -24,9 +24,17 @@ object PlayRoutesGenerator extends App {
     // println(s"play route: $playRoute")
 
     val yamlDoc = playRoute.toYamlString
-    yamlDoc.trim()
+    val yamlSummary = playRoute.toYamlSummary
+    (yamlDoc.trim(), yamlSummary.trim())
   }
 
-  val routesNoNewlines = routesDoc.filterNot(rd => Route.hasOnlyWhiteSpace(rd))
-  Files.write(Paths.get("routes.yaml"), routesNoNewlines.mkString(lineSep).getBytes(StandardCharsets.UTF_8))
+  val routesNoNewlines = routesDoc.map(_._1).filterNot(rd => Route.hasOnlyWhiteSpace(rd))
+  writeToFile("routes.yaml", routesNoNewlines)
+
+  val summaryNoNewlines = routesDoc.map(_._2).filterNot(rd => Route.hasOnlyWhiteSpace(rd))
+  writeToFile("summary.yaml", summaryNoNewlines)
+
+  private def writeToFile(fileName: String, contents: List[String]) = {
+    Files.write(Paths.get(fileName), contents.mkString(lineSep).getBytes(StandardCharsets.UTF_8))
+  }
 }
