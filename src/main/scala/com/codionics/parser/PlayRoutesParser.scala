@@ -67,6 +67,7 @@ object PlayRoutesParser {
   }
 
   def parseAsRoute(route: String): Route = {
+    // println(s"parsing route: $route")
     val parsedRoute = parseAsTuple(route)
     val parsedVal = parsedRoute.get.value
     

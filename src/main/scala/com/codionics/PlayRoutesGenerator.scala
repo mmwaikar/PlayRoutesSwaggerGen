@@ -16,7 +16,7 @@ object PlayRoutesGenerator extends App {
 
   val lineSep    = System.lineSeparator()
   val routesFile = args(0)
-  val playRoutes = fromFile(routesFile).getLines.toList
+  val playRoutes = fromFile(routesFile).getLines.toList.filterNot(l => l.startsWith("#") || l.trim.isEmpty)
   // println(s"play route: ${playRoutes(0)}")
 
   val routesDoc = playRoutes.map { r =>
