@@ -101,7 +101,9 @@ object Route {
     // and qualifiedMethodParts becomes ["get", "Containers"], so the second item is going to be the name of the domain object
     val qualifiedMethodParts = methodName.split("(?=\\p{Upper})")
 
-    val domain     = qualifiedMethodParts.tail.head.capitalize
+    // in case of types, the second and third item combined is the name of the type
+    val tail       = qualifiedMethodParts.tail
+    val domain     = if (methodName.contains("Types")) s"${tail.head}${tail.tail.head}" else tail.head.capitalize
     val domainName = if (domain.endsWith("s")) domain.dropRight(1) else domain
 
     RouteHelper(tag, methodName, qualifiedMethodParts, domainName)
