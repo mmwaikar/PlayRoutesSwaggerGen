@@ -2,8 +2,10 @@ package com.codionics.parser
 
 import com.codionics.domain._
 import fastparse._, NoWhitespace._
+import com.typesafe.scalalogging.Logger
 
 object PlayRoutesParser {
+  val logger = Logger(this.getClass)
 
   /** Parses one or more space " " characters.
     */
@@ -67,7 +69,9 @@ object PlayRoutesParser {
   }
 
   def parseAsRoute(route: String): Route = {
-    // println(s"parsing route: $route")
+    logger.info(s"parsing route:")
+    logger.info(s"$route")
+
     val parsedRoute = parseAsTuple(route)
     val parsedVal = parsedRoute.get.value
     

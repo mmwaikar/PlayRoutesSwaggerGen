@@ -16,7 +16,7 @@ case class RouteHelper(tag: String, methodName: String, qualifiedMethodParts: Se
   }
 
   def getHeading: String = {
-    s"${qualifiedMethodPartsLower.head}-$tag-${qualifiedMethodPartsLower.tail.mkString("-")}"
+    s"${qualifiedMethodPartsLower.head}-$tag-${qualifiedMethodPartsLower.tail.mkString("-")}:"
   }
 
   def getDescription: String = {

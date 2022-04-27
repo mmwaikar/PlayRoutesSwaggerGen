@@ -1,0 +1,22 @@
+<!--
+  ~ Copyright (C) 2016-2018 Lightbend Inc. <https://www.lightbend.com>
+  -->
+<!-- The default logback configuration that Lagom uses in dev mode if no other configuration is provided -->
+<configuration>
+
+  <conversionRule conversionWord="coloredLevel" converterClass="com.lightbend.lagom.internal.logback.ColoredLevel" />
+
+  <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder>
+      <pattern>%date %coloredLevel %logger [%line] - %msg%n</pattern>
+    </encoder>
+  </appender>
+
+  <!-- Set logging for all Play library classes to INFO -->
+  <!-- <logger name="play" level="ERROR" /> -->
+
+  <root level="DEBUG">
+    <appender-ref ref="STDOUT" />
+  </root>
+
+</configuration>
