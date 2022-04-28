@@ -1,14 +1,28 @@
 package com.codionics.domain
 
+/** A Play route is of the form: GET /employees/:key EmployeeController.getEmployeeByKey(key: String) which means, that
+  * it consists of an HTTP verb, followed by a path, a method name and the parameters to the method.
+  *
+  * @param httpVerb
+  *   the HTTP verb
+  * @param path
+  *   the URL path
+  * @param method
+  *   name of the method
+  * @param params
+  *   parameters to the method
+  */
 case class Route(httpVerb: String, path: String, method: String, params: Seq[Parameter]) {
+  val routeHelper: RouteHelper = Route.getRouteHelper(httpVerb, path, method)
+
+  def getTag: String = routeHelper.tag
 
   def getResponse: String = {
     if (httpVerb.toLowerCase == "get") "'200'" else "'201'"
   }
 
   def toYamlString: String = {
-    val routeHelper = Route.getRouteHelper(httpVerb, path, method)
-    val verb        = httpVerb.toLowerCase
+    val verb = httpVerb.toLowerCase
 
     val summary     = routeHelper.getSummary
     val heading     = routeHelper.getHeading
@@ -67,9 +81,8 @@ $heading
   }
 
   def toYamlSummary: String = {
-    val routeHelper = Route.getRouteHelper(httpVerb, path, method)
     val pathSummary = getPathSummary(path)
-    val schema = "$ref: " + s""""./paths/${routeHelper.tag}.yaml#/${routeHelper.getHeading}""""
+    val schema      = "$ref: " + s""""./paths/${routeHelper.tag}.yaml#/${routeHelper.getHeading}""""
 
     s"""
 $pathSummary:

@@ -6,8 +6,10 @@ import java.nio.file.Files
 import java.nio.file.Paths
 import java.nio.charset.StandardCharsets
 import scala.io.Source._
+import com.typesafe.scalalogging.Logger
 
 object PlayRoutesGenerator extends App {
+  val logger = Logger(this.getClass)
 
   if (args.isEmpty) {
     println("Usage: PlayRoutesGenerator <play routes file>")
@@ -17,22 +19,25 @@ object PlayRoutesGenerator extends App {
   val lineSep    = System.lineSeparator()
   val routesFile = args(0)
   val playRoutes = fromFile(routesFile).getLines.toList.filterNot(l => l.startsWith("#") || l.trim.isEmpty)
-  // println(s"play route: ${playRoutes(0)}")
+  logger.info(s"Parsed: ${playRoutes.size} play routes.")
 
   val routesDoc = playRoutes.map { r =>
     val playRoute = PlayRoutesParser.parseAsRoute(r.trim())
     // println(s"play route: $playRoute")
 
-    val yamlDoc = playRoute.toYamlString
+    val yamlDoc     = playRoute.toYamlString
     val yamlSummary = playRoute.toYamlSummary
-    (yamlDoc.trim(), yamlSummary.trim())
+    (yamlDoc.trim(), yamlSummary.trim(), playRoute.getTag)
   }
 
-  val routesNoNewlines = routesDoc.map(_._1).filterNot(rd => Route.hasOnlyWhiteSpace(rd))
-  writeToFile("routes.yaml", routesNoNewlines)
+  // NOTE: tag is going to be the same for all routes
+  val tag = routesDoc.head._3
 
-  val summaryNoNewlines = routesDoc.map(_._2).filterNot(rd => Route.hasOnlyWhiteSpace(rd))
-  writeToFile("summary.yaml", summaryNoNewlines)
+  val routesNoNewlines = routesDoc.map(_._1).filterNot(rd => Route.hasOnlyWhiteSpace(rd))
+  writeToFile(s"routes-$tag.yaml", routesNoNewlines)
+
+  val summaryNoNewlines                                             = routesDoc.map(_._2).filterNot(rd => Route.hasOnlyWhiteSpace(rd))
+  writeToFile(s"summary-$tag.yaml", summaryNoNewlines)
 
   private def writeToFile(fileName: String, contents: List[String]) = {
     Files.write(Paths.get(fileName), contents.mkString(lineSep).getBytes(StandardCharsets.UTF_8))
